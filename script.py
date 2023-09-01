@@ -47,7 +47,7 @@ def simulate(inputFile="in.melt", useGPU=True, useMPI=False, mpiHWThreads=False,
     mpi = f"mpirun -n {mpiNThreads} {'--use-hwthread-cpus' if mpiHWThreads else ''} " if useMPI else ""
     if not inTOKO:
         try:
-            return subprocess.check_output(f'{mpi} ../lmp_cuda {gpu} -in {inputFile}'.strip().replace("  ", " ").split(" "))
+            return subprocess.check_output(f'{mpi} ../lmp_cuda {gpu} -in {inputFile}'.strip().replace("  ", " ").replace("  ", " ").replace("  ", " ").split(" "))
         except subprocess.CalledProcessError as e:
             print("Error occurred", e, f"{inputFile=}", f"{useGPU=} {useMPI=} {mpiHWThreads=} {mpiNThreads=} {inTOKO=}")
             raise e
@@ -81,7 +81,7 @@ def parse_tpas_line(line: str):
         atoms = int(match.group(4))
         
         tpas = (loop_time / (procs * steps)) / atoms
-        return tpas
+        return tpas, loop_time
     else:
         return None
 
@@ -99,27 +99,6 @@ def parse_timings(result: str):
     df = pd.read_csv(StringIO(csv), header=0)
     return df.to_markdown()
 
-def output_result(result):
-    print(result)
-    print("=======")
-    print(f"TPAS ≈ **{calculate_tpas(result)*1_000_000}** microseconds/atom/step")
-    print(parse_timings(result))
-
-def tpas_sweep(steps=range(1000, 10000, 1000), simConfig={}, runConfig={}):
-    output = []
-    todo = [*steps]
-    for i in todo:
-        print(f"TPAS sweep {i}/{todo[-1]}.")
-        result = gen_and_sim({'run_steps':i, **simConfig},**runConfig)
-        tpas = calculate_tpas(result)
-        output.append(tpas)
-    return output
-
-def tpas_stats():
-    result = tpas_sweep()
-    s = pd.Series(result) * 1_000_000
-    print(f"{s}\n{s.mean()=}\n{s.std()=}")
-
 def output_tp_result(title, codeParams={}, simParams={}):
     output = ""
     output += "## " + title + "\n"
@@ -132,12 +111,13 @@ def output_tp_result(title, codeParams={}, simParams={}):
     
     output += "```\n### Result\n"
     result = gen_and_sim(codeParams=codeParams, simParams=simParams)
-    tpas = calculate_tpas(result)*1_000_000
+    tpas, loop_time = calculate_tpas(result)
+    tpas *= 1_000_000
     thermo = get_thermo_logs(result)
     output += f"TPAS ≈ **{tpas}** microseconds/atom/step\n"
     output += parse_timings(result) + "\n"
-
-    return output, result, tpas, thermo
+    print(f"Finished job '{title}' in {loop_time} seconds")
+    return output, result, tpas, thermo, loop_time
 
 def get_thermo_logs(result: str):
     section = extract_section(result, "Generated ")
@@ -225,7 +205,7 @@ def solve_tp1():
         )
     }
     for i in [2, 4, 8, 16]:
-        run_results['2. 2x']= output_tp_result(title=f"2. {i}x",
+        run_results[f'2. strong {i}x']= output_tp_result(title=f"2. strong {i}x",
                 codeParams={
                     'run_steps':1000,
                 }, simParams={
@@ -235,19 +215,52 @@ def solve_tp1():
                     'inTOKO':False
                 }
             )
-    print("TP:")
+    run_results[f'2. strong 32x[hw]']= output_tp_result(title=f"2. strong 32x[hw]",
+                codeParams={
+                    'run_steps':1000,
+                }, simParams={
+                    'useGPU':gpu,
+                    'useMPI':True,
+                    'mpiHWThreads':True,
+                    'mpiNThreads':32,
+                    'inTOKO':False
+                }
+            )
+    for i,(a,b,c) in enumerate([(2,1,1), (2,2,1), (2,2,2), (2,4,2)]):
+        run_results[f'2. weak {a*b*c}x']= output_tp_result(title=f"2. weak {a*b*c}x",
+                codeParams={
+                    'run_steps':1000,
+                    'box':(20*a,20*b,20*c)
+                }, simParams={
+                    'useGPU':gpu,
+                    'useMPI':True,
+                    'mpiHWThreads':True,
+                    'mpiNThreads':32 if not gpu else 1,
+                    'inTOKO':False
+                }
+            )
+    run_results['long_running'] = output_tp_result(title=f"long_running",
+        codeParams={
+            'run_steps':10000,
+            'thermo_log_freq': 5000,
+            'dump_pos_freq': 100,
+            'init_vel': 1.0
+        }, simParams={
+            'useGPU':True,
+            'useMPI':False,
+            'inTOKO':False
+        }
+    )
     computed_thermos = pd.DataFrame()
-    for i, (md, output, tpas, thermos) in run_results.items():
+    output_md = ""
+    for i, (md, output, tpas, thermos, runtime) in run_results.items():
         df2 = thermos.drop(columns=["Temp", "E_pair", "E_mol", "Press"])
         df2.plot(title=f"Simulation {i}").get_figure().savefig(f"plot_{i}.png")
-        print(md)
-        print(f"![Plot {i}](plot_{i}.png)\n")
+        output_md += md + "\n" + f"![Plot {i}](plot_{i}.png)\n"
         computed_thermos = pd.concat([computed_thermos, df2.agg(['mean','std']).rename(columns={'TotEng':f"TotEng {i}"})], axis=1)
-    print("## e - Overall system energy")
-    print(computed_thermos.to_markdown())
+    output_md += "## e - Overall system energy\n" + computed_thermos.to_markdown()
+    with open('out.md', 'w') as f:
+        f.write(output_md)
 solve_tp1()
 
 
-
-# result = gen_and_sim({'run_steps':10000},{})
-# output_result(result)
