@@ -182,7 +182,8 @@ c: The simulation cost increases by about 8x, because the box size increases by 
 
 c2: The simulation cost increases by about 8x, because the box size increases by 8x, and we are running on the same number of cores. (There seems to be no performance overhead when running on a single machine)
 
-d: I would expect the neighbor cost to _increase_ by about $4/3 \pi (2r)^3 - r^3$ or about $7r^3$, because the number of steps is the same, but the number of neighbors to check scales with the volume of the sphere of the neighbors. However, due to the very low initial cost of the neighbor check, the skin change barely affects the overall performance.
+d: I would expect the neighbor cost to _increase_ by about $4/3 \pi (2r)^3 - r^3$ or about $7r^3$, because the number of steps is the same, but the number of neighbors to check scales with the volume of the sphere of the neighbors.
+In our example, with relation to the base run this amounts to about a 33% increase in wall time. 
 
 e: They are very similar, this is to be expected as the number of steps is the same, and the number of atoms is the same.
 
