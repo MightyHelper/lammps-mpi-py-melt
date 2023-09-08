@@ -7,7 +7,7 @@ Federico Williamson / 13938
 ## Section I
 
 ### Part 1: Run results:
-<div class="pb_after"></div>
+
 
 #### a - Base run
 ##### Code params
@@ -19,18 +19,18 @@ run_steps: 1000
 use_mpi: False
 ```
 ##### Result
-TPAS ~= **0.377946875** microseconds/atom/step/core
+TPAS ~= **0.378** microseconds/atom/step/core
 
 |    | Section    |   min time     |     avg time   |   max time     | %varavg   |    %total |
 |---:|:-----------|:---------------|---------------:|:---------------|:----------|----------:|
-|  0 | Pair       | 9.8565         |      9.8565    | 9.8565         | 0.0       |     81.5  |
-|  1 | Neigh      | 2.05           |      2.05      | 2.05           | 0.0       |     16.95 |
-|  2 | Comm       | 0.041086       |      0.041086  | 0.041086       | 0.0       |      0.34 |
-|  3 | Output     | 0.0001057      |      0.0001057 | 0.0001057      | 0.0       |      0    |
-|  4 | Modify     | 0.13222        |      0.13222   | 0.13222        | 0.0       |      1.09 |
-|  5 | Other      |                |      0.01433   |                |           |      0.12 |
+|  0 | Pair       | 9.8574         |     9.8574     | 9.8574         | 0.0       |     81.51 |
+|  1 | Neigh      | 2.0487         |     2.0487     | 2.0487         | 0.0       |     16.94 |
+|  2 | Comm       | 0.04139        |     0.04139    | 0.04139        | 0.0       |      0.34 |
+|  3 | Output     | 0.00010031     |     0.00010031 | 0.00010031     | 0.0       |      0    |
+|  4 | Modify     | 0.1323         |     0.1323     | 0.1323         | 0.0       |      1.09 |
+|  5 | Other      |                |     0.01307    |                |           |      0.11 |
 
-Loop time: 12.0943
+Loop time: 12.0929
 
 ![Plot a](plot_a.png){ width=100% }
 
@@ -46,18 +46,18 @@ run_steps: 10000
 use_mpi: False
 ```
 ##### Result
-TPAS ~= **0.38472812500000003** microseconds/atom/step/core
+TPAS ~= **0.384** microseconds/atom/step/core
 
 |    | Section    |   min time     |     avg time   |   max time     | %varavg   |    %total |
 |---:|:-----------|:---------------|---------------:|:---------------|:----------|----------:|
-|  0 | Pair       | 100.18         |     100.18     | 100.18         | 0.0       |     81.37 |
-|  1 | Neigh      | 21.026         |      21.026    | 21.026         | 0.0       |     17.08 |
-|  2 | Comm       | 0.41014        |       0.41014  | 0.41014        | 0.0       |      0.33 |
-|  3 | Output     | 0.012508       |       0.012508 | 0.012508       | 0.0       |      0.01 |
-|  4 | Modify     | 1.3445         |       1.3445   | 1.3445         | 0.0       |      1.09 |
-|  5 | Other      |                |       0.1441   |                |           |      0.12 |
+|  0 | Pair       | 99.956         |      99.956    | 99.956         | 0.0       |     81.4  |
+|  1 | Neigh      | 20.942         |      20.942    | 20.942         | 0.0       |     17.05 |
+|  2 | Comm       | 0.40992        |       0.40992  | 0.40992        | 0.0       |      0.33 |
+|  3 | Output     | 0.012552       |       0.012552 | 0.012552       | 0.0       |      0.01 |
+|  4 | Modify     | 1.331          |       1.331    | 1.331          | 0.0       |      1.08 |
+|  5 | Other      |                |       0.1448   |                |           |      0.12 |
 
-Loop time: 123.113
+Loop time: 122.796
 
 ![Plot b](plot_b.png){ width=100% }
 
@@ -74,18 +74,18 @@ box: (40, 40, 40)
 use_mpi: False
 ```
 ##### Result
-TPAS ~= **0.3797671875** microseconds/atom/step/core
+TPAS ~= **0.371** microseconds/atom/step/core
 
 |    | Section    |   min time     |     avg time   |   max time     | %varavg   |    %total |
 |---:|:-----------|:---------------|---------------:|:---------------|:----------|----------:|
-|  0 | Pair       | 78.395         |    78.395      | 78.395         | 0.0       |     80.64 |
-|  1 | Neigh      | 16.221         |    16.221      | 16.221         | 0.0       |     16.69 |
-|  2 | Comm       | 0.37107        |     0.37107    | 0.37107        | 0.0       |      0.38 |
-|  3 | Output     | 0.00070402     |     0.00070402 | 0.00070402     | 0.0       |      0    |
-|  4 | Modify     | 1.8181         |     1.8181     | 1.8181         | 0.0       |      1.87 |
-|  5 | Other      |                |     0.4146     |                |           |      0.43 |
+|  0 | Pair       | 76.481         |    76.481      | 76.481         | 0.0       |     80.63 |
+|  1 | Neigh      | 15.935         |    15.935      | 15.935         | 0.0       |     16.8  |
+|  2 | Comm       | 0.39647        |     0.39647    | 0.39647        | 0.0       |      0.42 |
+|  3 | Output     | 0.00070795     |     0.00070795 | 0.00070795     | 0.0       |      0    |
+|  4 | Modify     | 1.6273         |     1.6273     | 1.6273         | 0.0       |      1.72 |
+|  5 | Other      |                |     0.4135     |                |           |      0.44 |
 
-Loop time: 97.2204
+Loop time: 94.8545
 
 ![Plot c](plot_c.png){ width=100% }
 
@@ -102,18 +102,18 @@ box: (20, 20, 160)
 use_mpi: False
 ```
 ##### Result
-TPAS ~= **0.381780078125** microseconds/atom/step/core
+TPAS ~= **0.382** microseconds/atom/step/core
 
 |    | Section    |   min time     |     avg time   |   max time     | %varavg   |    %total |
 |---:|:-----------|:---------------|---------------:|:---------------|:----------|----------:|
-|  0 | Pair       | 78.876         |    78.876      | 78.876         | 0.0       |     80.7  |
-|  1 | Neigh      | 16.141         |    16.141      | 16.141         | 0.0       |     16.52 |
-|  2 | Comm       | 0.59847        |     0.59847    | 0.59847        | 0.0       |      0.61 |
-|  3 | Output     | 0.00071662     |     0.00071662 | 0.00071662     | 0.0       |      0    |
-|  4 | Modify     | 1.7053         |     1.7053     | 1.7053         | 0.0       |      1.74 |
-|  5 | Other      |                |     0.4141     |                |           |      0.42 |
+|  0 | Pair       | 78.816         |    78.816      | 78.816         | 0.0       |     80.65 |
+|  1 | Neigh      | 16.136         |    16.136      | 16.136         | 0.0       |     16.51 |
+|  2 | Comm       | 0.6813         |     0.6813     | 0.6813         | 0.0       |      0.7  |
+|  3 | Output     | 0.00071879     |     0.00071879 | 0.00071879     | 0.0       |      0    |
+|  4 | Modify     | 1.6833         |     1.6833     | 1.6833         | 0.0       |      1.72 |
+|  5 | Other      |                |     0.4143     |                |           |      0.42 |
 
-Loop time: 97.7357
+Loop time: 97.7321
 
 ![Plot c2](plot_c2.png){ width=100% }
 
@@ -130,18 +130,18 @@ neigh_skin: 0.6
 use_mpi: False
 ```
 ##### Result
-TPAS ~= **0.527115625** microseconds/atom/step/core
+TPAS ~= **0.530** microseconds/atom/step/core
 
 |    | Section    |   min time     |     avg time   |   max time     | %varavg   |    %total |
 |---:|:-----------|:---------------|---------------:|:---------------|:----------|----------:|
-|  0 | Pair       | 14.401         |    14.401      | 14.401         | 0.0       |     85.38 |
-|  1 | Neigh      | 2.2757         |     2.2757     | 2.2757         | 0.0       |     13.49 |
-|  2 | Comm       | 0.041579       |     0.041579   | 0.041579       | 0.0       |      0.25 |
-|  3 | Output     | 0.00010436     |     0.00010436 | 0.00010436     | 0.0       |      0    |
-|  4 | Modify     | 0.13449        |     0.13449    | 0.13449        | 0.0       |      0.8  |
-|  5 | Other      |                |     0.01441    |                |           |      0.09 |
+|  0 | Pair       | 14.474         |    14.474      | 14.474         | 0.0       |     85.33 |
+|  1 | Neigh      | 2.2878         |     2.2878     | 2.2878         | 0.0       |     13.49 |
+|  2 | Comm       | 0.045207       |     0.045207   | 0.045207       | 0.0       |      0.27 |
+|  3 | Output     | 0.00010528     |     0.00010528 | 0.00010528     | 0.0       |      0    |
+|  4 | Modify     | 0.13921        |     0.13921    | 0.13921        | 0.0       |      0.82 |
+|  5 | Other      |                |     0.01594    |                |           |      0.09 |
 
-Loop time: 16.8677
+Loop time: 16.9622
 
 ![Plot d](plot_d.png){ width=100% }
 
@@ -159,18 +159,18 @@ do_video_dump: True
 use_mpi: False
 ```
 ##### Result
-TPAS ~= **0.4909562499999999** microseconds/atom/step/core
+TPAS ~= **0.488** microseconds/atom/step/core
 
 |    | Section    |   min time     |     avg time   |   max time     | %varavg   |    %total |
 |---:|:-----------|:---------------|---------------:|:---------------|:----------|----------:|
-|  0 | Pair       | 9.9407         |       9.9407   | 9.9407         | 0.0       |     63.27 |
-|  1 | Neigh      | 2.0629         |       2.0629   | 2.0629         | 0.0       |     13.13 |
-|  2 | Comm       | 0.042966       |       0.042966 | 0.042966       | 0.0       |      0.27 |
-|  3 | Output     | 3.5107         |       3.5107   | 3.5107         | 0.0       |     22.35 |
-|  4 | Modify     | 0.13888        |       0.13888  | 0.13888        | 0.0       |      0.88 |
-|  5 | Other      |                |       0.01449  |                |           |      0.09 |
+|  0 | Pair       | 9.8829         |       9.8829   | 9.8829         | 0.0       |     63.32 |
+|  1 | Neigh      | 2.0568         |       2.0568   | 2.0568         | 0.0       |     13.18 |
+|  2 | Comm       | 0.043411       |       0.043411 | 0.043411       | 0.0       |      0.28 |
+|  3 | Output     | 3.472          |       3.472    | 3.472          | 0.0       |     22.24 |
+|  4 | Modify     | 0.13817        |       0.13817  | 0.13817        | 0.0       |      0.89 |
+|  5 | Other      |                |       0.01514  |                |           |      0.1  |
 
-Loop time: 15.7106
+Loop time: 15.6084
 
 ![Plot f](plot_f.png){ width=100% }
 
@@ -187,18 +187,18 @@ balance: 1.2 shift xz 5 1.1
 use_mpi: False
 ```
 ##### Result
-TPAS ~= **0.380215625** microseconds/atom/step/core
+TPAS ~= **0.378** microseconds/atom/step/core
 
 |    | Section    |   min time     |     avg time   |   max time     | %varavg   |    %total |
 |---:|:-----------|:---------------|---------------:|:---------------|:----------|----------:|
-|  0 | Pair       | 9.9159         |     9.9159     | 9.9159         | 0.0       |     81.5  |
-|  1 | Neigh      | 2.0599         |     2.0599     | 2.0599         | 0.0       |     16.93 |
-|  2 | Comm       | 0.041267       |     0.041267   | 0.041267       | 0.0       |      0.34 |
-|  3 | Output     | 0.00010675     |     0.00010675 | 0.00010675     | 0.0       |      0    |
-|  4 | Modify     | 0.13531        |     0.13531    | 0.13531        | 0.0       |      1.11 |
-|  5 | Other      |                |     0.01434    |                |           |      0.12 |
+|  0 | Pair       | 9.8412         |     9.8412     | 9.8412         | 0.0       |     81.43 |
+|  1 | Neigh      | 2.0524         |     2.0524     | 2.0524         | 0.0       |     16.98 |
+|  2 | Comm       | 0.041288       |     0.041288   | 0.041288       | 0.0       |      0.34 |
+|  3 | Output     | 0.00010442     |     0.00010442 | 0.00010442     | 0.0       |      0    |
+|  4 | Modify     | 0.13539        |     0.13539    | 0.13539        | 0.0       |      1.12 |
+|  5 | Other      |                |     0.01447    |                |           |      0.12 |
 
-Loop time: 12.1669
+Loop time: 12.0849
 
 ![Plot g](plot_g.png){ width=100% }
 
@@ -211,9 +211,17 @@ Loop time: 12.1669
 | mean | -5.27716    | -5.27829    | -5.27729    | -5.27725    | -5.27716    | -5.27716    | -5.27716    |
 | std  |  0.00530259 |  0.00421841 |  0.00553594 |  0.00547916 |  0.00530259 |  0.00530259 |  0.00530259 |
 
-![Raw scaling results](scale.png){ width=45% } ![Core count normalized results](scale2.png){ width=45% } ![Base run normalized results](scale3.png){ width=45% } ![Core count base run normalized results](scale4.png){ width=45% }
-
 <div class="pb_after"></div>
+
+
+![Weak speedup](weak_speedup.png){ width=100% }
+![Weak efficiency](weak_efficiency.png){ width=100% }
+![Strong speedup](strong_speedup.png){ width=100% }
+![Strong efficiency](strong_efficiency.png){ width=100% }
+![Speedup](speedup.png){ width=100% } ![Logarithmic speedup](speedup_log.png){ width=100% }
+![Efficiency](efficiency.png){ width=100% }
+
+
 
 a: Base run
 
@@ -223,7 +231,8 @@ c: The simulation cost increases by about 8x, because the box size increases by 
 
 c2: The simulation cost increases by about 8x, because the box size increases by 8x, and we are running on the same number of cores. (There seems to be no performance overhead when running on a single machine)
 
-d: I would expect the neighbor cost to _increase_ by about $4/3 \pi (2r)^3 - r^3$ or about $7r^3$, because the number of steps is the same, but the number of neighbors to check scales with the volume of the sphere of the neighbors. However, due to the very low initial cost of the neighbor check, the skin change barely affects the overall performance.
+d: I would expect the neighbor cost to _increase_ by about $4/3 \pi (2r)^3 - r^3$ or about $7r^3$, because the number of steps is the same, but the number of neighbors to check scales with the volume of the sphere of the neighbors.
+In our example, with relation to the base run this amounts to about a 33% increase in wall time. 
 
 e: They are very similar, this is to be expected as the number of steps is the same, and the number of atoms is the same.
 

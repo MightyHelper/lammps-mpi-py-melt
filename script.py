@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from mpilammpsrun import MpiLammpsRun
 
@@ -18,7 +19,7 @@ def output_tp_result(title, code_params=None, sim_params=None):
 {merge([f'{k}: {v}' for k, v in lammps_run.sim_params.items()])}
 ```
 ##### Result
-TPAS ~= **{lammps_run.tpas * 1_000_000}** microseconds/atom/step/core
+TPAS ~= **{lammps_run.tpas * 1_000_000:.3f}** microseconds/atom/step/core
 
 {lammps_run.timings.to_markdown()}
 
@@ -36,26 +37,46 @@ def output_scaling_test_results(scaling_run_results):
             strong.append(lammps_run.loop_time)
         if 'weak' in i:
             weak.append(lammps_run.loop_time)
-    df = pd.DataFrame(data=np.array([weak, strong]).transpose(), columns=['weak', 'strong'], index=[2, 4, 8, 16, 32])
-    df.plot(title="Raw scaling test results").get_figure().savefig(f"scale.png")
-    df['strong_norm_core'] = df['strong'] * df.index
-    df['weak_norm_core'] = df['weak'] / df.index
-    df['strong_norm'] = df['strong'] / df['strong'][2]  # TODO: Consider using iloc
-    df['weak_norm'] = df['weak'] / df['weak'][2]
-    core_norm_df = df.drop(columns=['strong_norm', 'weak_norm', 'strong', 'weak'])
-    initial_norm_df = df.drop(columns=['strong_norm_core', 'weak_norm_core', 'strong', 'weak'])
-    core_norm_df.plot(title="Core count normalized scaling results").get_figure().savefig(f"scale2.png")
-    core_initial_norm_df = core_norm_df / core_norm_df.iloc[0]
-    initial_norm_df.plot(title="Base run normalized scaling results").get_figure().savefig(f"scale3.png")
-    core_initial_norm_df.plot(title="Core count base run normalized scaling results").get_figure().savefig(
-        f"scale4.png")
-    print("Scaling test results: ", strong, weak)
-    return ("\n" +
-            f"![Raw scaling results](scale.png){{ width=45% }} " +
-            f"![Core count normalized results](scale2.png){{ width=45% }} " +
-            f"![Base run normalized results](scale3.png){{ width=45% }} " +
-            f"![Core count base run normalized results](scale4.png){{ width=45% }}\n\n"
-            )
+    df = pd.DataFrame(data=np.array([weak, strong]).transpose(), columns=['weak', 'strong'], index=[1, 2, 4, 8, 16, 32])
+    plot_scaling_results(df)
+    out_md = ""
+    out_md += "![Weak speedup](weak_speedup.png){ width=100% }\n"
+    out_md += "![Weak efficiency](weak_efficiency.png){ width=100% }\n"
+    out_md += "![Strong speedup](strong_speedup.png){ width=100% }\n"
+    out_md += "![Strong efficiency](strong_efficiency.png){ width=100% }\n"
+    out_md += "![Speedup](speedup.png){ width=100% } ![Logarithmic speedup](speedup_log.png){ width=100% }\n"
+    out_md += "![Efficiency](efficiency.png){ width=100% }\n"
+    # print(df.to_string())
+    # print()
+    # raw_df = df.copy()
+    # df['strong_norm_core'] = df['strong'] * df.index
+    # df['weak_norm_core'] = df['weak'] / df.index
+    # df['strong_norm'] = df['strong'] / df['strong'].iloc[0]
+    # df['weak_norm'] = df['weak'] / df['weak'].iloc[0]
+    # print(df.to_string())
+    # core_norm_df = df.drop(columns=['strong_norm', 'weak_norm', 'strong', 'weak'])
+    # initial_norm_df = df.drop(columns=['strong_norm_core', 'weak_norm_core', 'strong', 'weak'])
+    # core_initial_norm_df = core_norm_df / core_norm_df.iloc[0]
+    # plots = {
+    #     ('scale1.png', "Raw scaling results"): raw_df.plot(title="Raw scaling test results"),
+    #     ('scale2.png', "Core count normalized results"): core_norm_df.plot(
+    #         title="Core count normalized scaling results"),
+    #     ('scale3.png', "Base run normalized results"): initial_norm_df.plot(
+    #         title="Base run normalized scaling results"),
+    #     ('scale4.png', "Core count base run normalized results"): core_initial_norm_df.plot(
+    #         title="Core count base run normalized scaling results")
+    # }
+    # out_md = ""
+    # for (filename, file_desc), ax in plots.items():
+    #     ax.set_xlabel("Core count")
+    #     relative = 'Relative ' if 'norm' in file_desc else ''
+    #     per_core = '/ Core' if 'Core' in file_desc else ''
+    #     ax.set_ylabel(relative + "Time " + per_core + ' (s)')
+    #     ax.get_legend().remove()
+    #     ax.get_figure().savefig(filename)
+    #     out_md += f"![{file_desc}]({filename}){{ width=45% }} "
+    # print("Scaling test results: ", strong, weak)
+    return f"\n{out_md}\n"
 
 
 def output_main_tp_results(run_results):
@@ -84,7 +105,7 @@ def do_long_running_test():
 def perform_scaling_tests(gpu):
     scaling_run_results = {}
     gpu_cfg = {'use_gpu': gpu} if gpu else {}
-    for i in [2, 4, 8, 16]:
+    for i in [1, 2, 4, 8, 16]:
         scaling_run_results[f'2. strong {i}x'] = output_tp_result(
             title=f"2. strong {i}x",
             code_params={'run_steps': 1000, },
@@ -95,7 +116,7 @@ def perform_scaling_tests(gpu):
         code_params={'run_steps': 1000, },
         sim_params={**gpu_cfg, 'use_mpi': True, 'mpi_hw_threads': True, 'mpi_n_threads': 32}
     )
-    for i, (a, b, c) in enumerate([(2, 1, 1), (2, 2, 1), (2, 2, 2), (2, 4, 2), (4, 4, 2)]):
+    for i, (a, b, c) in enumerate([(1, 1, 1), (2, 1, 1), (2, 2, 1), (2, 2, 2), (2, 4, 2), (4, 4, 2)]):
         scaling_run_results[f'2. weak {a * b * c}x'] = output_tp_result(
             title=f"2. weak {a * b * c}x",
             code_params={'run_steps': 1000, 'box': (20 * a, 20 * b, 20 * c)},
@@ -301,6 +322,78 @@ def mem_stress_test():
     )[1].output)
 
 
+def plot_scaling_results(df):
+    # Create a DataFrame from the provided data
+
+    # Calculate speedup and efficiency for both weak and strong scaling
+    df['weak_speedup'] = df['weak'][1] / df['weak']
+    df['weak_efficiency'] = df['weak_speedup'] / df.index
+    df['strong_speedup'] = df['strong'][1] / df['strong']
+    df['strong_efficiency'] = df['strong_speedup'] / df.index
+
+    ideal_speedup = df.index
+    ideal_efficiency = [1.0] * len(df.index)
+
+    # Plot and save the figures
+    weak_speedup_fig = df['weak_speedup'].plot(marker='o', linestyle='-', label='Weak Speedup')
+    plt.xlabel('System Size (x times base size)')
+    plt.ylabel('Speedup')
+    plt.legend()
+    weak_speedup_fig.get_figure().savefig('weak_speedup.png')
+    plt.clf()
+
+    weak_efficiency_fig = df['weak_efficiency'].plot(marker='o', linestyle='-', label='Weak Efficiency')
+    plt.xlabel('System Size (x times base size)')
+    plt.ylabel('Efficiency')
+    plt.legend()
+    weak_efficiency_fig.get_figure().savefig('weak_efficiency.png')
+    plt.clf()
+
+    strong_speedup_fig = df['strong_speedup'].plot(marker='o', linestyle='-', label='Strong Speedup')
+    plt.xlabel('Number of Cores')
+    plt.ylabel('Speedup')
+    plt.legend()
+    strong_speedup_fig.get_figure().savefig('strong_speedup.png')
+    plt.clf()
+
+    strong_efficiency_fig = df['strong_efficiency'].plot(marker='o', linestyle='-', label='Strong Efficiency')
+    plt.xlabel('Number of Cores')
+    plt.ylabel('Efficiency')
+    plt.legend()
+    strong_efficiency_fig.get_figure().savefig('strong_efficiency.png')
+    plt.clf()
+
+    # Plot and save the figures
+    weak_speedup_fig = (df[['weak_speedup', 'strong_speedup']]
+                        .plot(marker='o', linestyle='-', label='Weak Speedup'))
+    plt.xlabel('System Size or Core count')
+    plt.ylabel('Speedup')
+    plt.plot(df.index, ideal_speedup, linestyle='--', label='Ideal Speedup')
+    plt.legend()
+    weak_speedup_fig.get_figure().savefig('speedup.png')
+    plt.yscale('log')
+    weak_speedup_fig.get_figure().savefig('speedup_log.png')
+    plt.clf()
+
+    weak_efficiency_fig = (df[['weak_efficiency', 'strong_efficiency']]
+                           .plot(marker='o', linestyle='-', label='Weak Efficiency'))
+    plt.xlabel('System Size or Core count')
+    plt.ylabel('Efficiency')
+    plt.plot(df.index, ideal_efficiency, linestyle='--', label='Ideal Efficiency')
+    plt.legend()
+    weak_efficiency_fig.get_figure().savefig('efficiency.png')
+    plt.clf()
+
+
+def sample_scaling_data():
+    data = {
+        'weak': [1.47974, 2.82150, 5.61277, 11.21030, 23.51570, 52.26130],
+        'strong': [12.055400, 6.393820, 4.457040, 2.121380, 1.491360, 0.976422]
+    }
+    return pd.DataFrame(data, index=[1, 2, 4, 8, 16, 32])
+
+
+# plot_scaling_results(sample_scaling_data())
 solve_tp1(scaling_tests=True, main_tp_tests=True)
 # mem_stress_test()
 # pandoc out.md -f markdown-implicit_figures -o out.pdf
