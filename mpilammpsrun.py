@@ -3,7 +3,7 @@ from io import StringIO
 
 import pandas as pd
 
-from sims.mpilammpswrapper import MpiLammpsWrapper
+from mpilammpswrapper import MpiLammpsWrapper
 
 
 class MpiLammpsRun:
