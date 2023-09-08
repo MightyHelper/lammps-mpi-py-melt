@@ -7,44 +7,44 @@ class MpiLammpsWrapper:
                   run_steps=1000,
                   do_image_dump=False, do_video_dump=False, balance=None):
         image_dump = """
-    dump             2 all image 25 image.*.jpg type type &
-                     axes yes 0.8 0.02 view 60 -30
-    dump_modify      2 pad 3
+dump             2 all image 25 image.*.jpg type type &
+                 axes yes 0.8 0.02 view 60 -30
+dump_modify      2 pad 3
 """
         video_dump = """
-    dump             3 all movie 25 movie.mpg type type &
-                     axes yes 0.8 0.02 view 60 -30
-    dump_modify      3 pad 3
+dump             3 all movie 25 movie.mpg type type &
+                 axes yes 0.8 0.02 view 60 -30
+dump_modify      3 pad 3
 """
         return f"""
-                                                                            # 3d Lennard-Jones melt
-    units            lj
-    atom_style       atomic                                                 # / full
-    newton           off
-    
-    timestep         0.001
-    lattice          fcc 0.8442                                             # Face center cubic / density
-    region           box block 0 {box[0]} 0 {box[1]} 0 {box[2]}             # repeat box 
-    create_box       1 box
-    create_atoms     1 box                                                  # atoms of type 1
-    mass             1 1.0                                                  # set mass of atoms of type 1 to 1.0
-                     {'balance ' + balance if balance is not None else ''}
-    
-    velocity         all create {init_vel} 87287 loop geom                  # Assign velocity with energy 3.0 and seed 87...
-    
-    pair_style       lj/cut 2.5                                             # LJ params
-    pair_coeff       1 1 1.0 1.0 2.5
-    
-    neighbor         {neigh_skin} bin                                       # Skin [R_j]
-    neigh_modify     every 20 delay 0 check no                              # checks expected neighbors
-    
-    fix              1 all nve                                              # How to update velocity
-    
-    dump             id all atom {dump_pos_freq} dump.melt.*
-    {image_dump if do_image_dump else ''}
-    {video_dump if do_video_dump else ''}
-    thermo           {thermo_log_freq}                                      # How often to log temperature
-    run              {run_steps}                                            # Run for N steps
+                                                                        # 3d Lennard-Jones melt
+units            lj
+atom_style       atomic                                                 # / full
+newton           off
+
+timestep         0.001
+lattice          fcc 0.8442                                             # Face center cubic / density
+region           box block 0 {box[0]} 0 {box[1]} 0 {box[2]}             # repeat box 
+create_box       1 box
+create_atoms     1 box                                                  # atoms of type 1
+mass             1 1.0                                                  # set mass of atoms of type 1 to 1.0
+                 {'balance ' + balance if balance is not None else ''}
+
+velocity         all create {init_vel} 87287 loop geom                  # Assign velocity with energy 3.0 and seed 87...
+
+pair_style       lj/cut 2.5                                             # LJ params
+pair_coeff       1 1 1.0 1.0 2.5
+
+neighbor         {neigh_skin} bin                                       # Skin [R_j]
+neigh_modify     every 20 delay 0 check no                              # checks expected neighbors
+
+fix              1 all nve                                              # How to update velocity
+
+dump             id all atom {dump_pos_freq} dump.melt.*
+{image_dump if do_image_dump else ''}
+{video_dump if do_video_dump else ''}
+thermo           {thermo_log_freq}                                      # How often to log temperature
+run              {run_steps}                                            # Run for N steps
     """
 
     @staticmethod
