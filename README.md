@@ -6,3 +6,5 @@ Run output parser: mpilammpsrun.py
 ```
 
 `script.py` uses the previous libraries and solves tp-1 from Arquitecturas Distribuidas 2023 UNCUYO.
+
+You may view the report in [out.md](out.md)
