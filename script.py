@@ -183,7 +183,7 @@ Federico Williamson / 13938
 
 ### Part 1: Run results:
 
-"""
+""" + page_break() + "\n\n"
     if main_tp_tests:
         run_results = calculate_main_tp(use_gpu)
         computed_thermos, md = output_main_tp_results(run_results)
@@ -324,6 +324,7 @@ def mem_stress_test():
 
 def plot_scaling_results(df):
     # Create a DataFrame from the provided data
+    plt.clf()
 
     # Calculate speedup and efficiency for both weak and strong scaling
     df['weak_speedup'] = df['weak'][1] / df['weak']
