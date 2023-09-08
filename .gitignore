@@ -2,3 +2,4 @@ image*
 log.lammps
 dump.melt*
 __pycache__/*
+lammps_output/*

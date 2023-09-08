@@ -3,7 +3,7 @@ import subprocess
 
 class MpiLammpsWrapper:
     @staticmethod
-    def _get_code(box=(20, 20, 20), init_vel=1.0, neigh_skin=0.3, dump_pos_freq=1000, thermo_log_freq=50,
+    def _get_code(box=(20, 20, 20), init_vel=1.0, neigh_skin=0.3, dump_pos_freq=10000, thermo_log_freq=5000,
                   run_steps=1000,
                   do_image_dump=False, do_video_dump=False, balance=None):
         image_dump = """
@@ -48,19 +48,20 @@ run              {run_steps}                                            # Run fo
     """
 
     @staticmethod
-    def _simulate(input_file="in.melt", use_gpu=True, use_mpi=False, mpi_hw_threads=False, mpi_n_threads=1,
-                  in_toko=False):
+    def _simulate(input_file="in.melt", use_gpu=False, use_mpi=False, mpi_hw_threads=False, mpi_n_threads=1,
+                  in_toko=False, cwd='./lammps_output', lammps_executable='../../lmp_cuda'):
         gpu = "-sf gpu -pk gpu 1" if use_gpu else ""
         mpi = f"mpirun -n {mpi_n_threads} {'--use-hwthread-cpus' if mpi_hw_threads else ''} " if use_mpi else ""
         if not in_toko:
             try:
                 return subprocess.check_output(
-                    f'{mpi} ../lmp_cuda {gpu} -in {input_file}'
+                    f'{mpi} {lammps_executable} {gpu} -in {input_file}'
                     .strip()
                     .replace("  ", " ")
                     .replace("  ", " ")
                     .replace("  ", " ")
-                    .split(" ")
+                    .split(" "),
+                    cwd=cwd
                 )
             except subprocess.CalledProcessError as e:
                 print("Error occurred", e, f"{input_file=}",
