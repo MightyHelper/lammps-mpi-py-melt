@@ -38,44 +38,17 @@ def output_scaling_test_results(scaling_run_results):
         if 'weak' in i:
             weak.append(lammps_run.loop_time)
     df = pd.DataFrame(data=np.array([weak, strong]).transpose(), columns=['weak', 'strong'], index=[1, 2, 4, 8, 16, 32])
+    df2 = df.copy()
     plot_scaling_results(df)
+    plot_scaling_results2(df2)
     out_md = ""
-    out_md += "![Weak speedup](weak_speedup.png){ width=100% }\n"
-    out_md += "![Weak efficiency](weak_efficiency.png){ width=100% }\n"
-    out_md += "![Strong speedup](strong_speedup.png){ width=100% }\n"
-    out_md += "![Strong efficiency](strong_efficiency.png){ width=100% }\n"
-    out_md += "![Speedup](speedup.png){ width=100% } ![Logarithmic speedup](speedup_log.png){ width=100% }\n"
-    out_md += "![Efficiency](efficiency.png){ width=100% }\n"
-    # print(df.to_string())
-    # print()
-    # raw_df = df.copy()
-    # df['strong_norm_core'] = df['strong'] * df.index
-    # df['weak_norm_core'] = df['weak'] / df.index
-    # df['strong_norm'] = df['strong'] / df['strong'].iloc[0]
-    # df['weak_norm'] = df['weak'] / df['weak'].iloc[0]
-    # print(df.to_string())
-    # core_norm_df = df.drop(columns=['strong_norm', 'weak_norm', 'strong', 'weak'])
-    # initial_norm_df = df.drop(columns=['strong_norm_core', 'weak_norm_core', 'strong', 'weak'])
-    # core_initial_norm_df = core_norm_df / core_norm_df.iloc[0]
-    # plots = {
-    #     ('scale1.png', "Raw scaling results"): raw_df.plot(title="Raw scaling test results"),
-    #     ('scale2.png', "Core count normalized results"): core_norm_df.plot(
-    #         title="Core count normalized scaling results"),
-    #     ('scale3.png', "Base run normalized results"): initial_norm_df.plot(
-    #         title="Base run normalized scaling results"),
-    #     ('scale4.png', "Core count base run normalized results"): core_initial_norm_df.plot(
-    #         title="Core count base run normalized scaling results")
-    # }
-    # out_md = ""
-    # for (filename, file_desc), ax in plots.items():
-    #     ax.set_xlabel("Core count")
-    #     relative = 'Relative ' if 'norm' in file_desc else ''
-    #     per_core = '/ Core' if 'Core' in file_desc else ''
-    #     ax.set_ylabel(relative + "Time " + per_core + ' (s)')
-    #     ax.get_legend().remove()
-    #     ax.get_figure().savefig(filename)
-    #     out_md += f"![{file_desc}]({filename}){{ width=45% }} "
-    # print("Scaling test results: ", strong, weak)
+    out_md += "![Scaling](scaling.png){ width=100% }\n"
+    out_md += "![Weak speedup](weak_speedup.png){ width=45% }\n"
+    out_md += "![Weak efficiency](weak_efficiency.png){ width=45% }\n"
+    out_md += "![Strong speedup](strong_speedup.png){ width=45% }\n"
+    out_md += "![Strong efficiency](strong_efficiency.png){ width=45% }\n"
+    out_md += "![Speedup](speedup.png){ width=45% } ![Logarithmic speedup](speedup_log.png){ width=45% }\n"
+    out_md += "![Efficiency](efficiency.png){ width=45% }\n"
     return f"\n{out_md}\n"
 
 
@@ -105,22 +78,17 @@ def do_long_running_test():
 def perform_scaling_tests(gpu):
     scaling_run_results = {}
     gpu_cfg = {'use_gpu': gpu} if gpu else {}
-    for i in [1, 2, 4, 8, 16]:
+    for i in [1, 2, 4, 8, 16, 32]:
         scaling_run_results[f'2. strong {i}x'] = output_tp_result(
             title=f"2. strong {i}x",
             code_params={'run_steps': 1000, },
-            sim_params={**gpu_cfg, 'use_mpi': True, 'mpi_n_threads': i}
+            sim_params={**gpu_cfg, 'use_mpi': True, 'mpi_hw_threads': True, 'mpi_n_threads': i}
         )
-    scaling_run_results[f'2. strong 32x - hw'] = output_tp_result(
-        title=f"2. strong 32x - hw",
-        code_params={'run_steps': 1000, },
-        sim_params={**gpu_cfg, 'use_mpi': True, 'mpi_hw_threads': True, 'mpi_n_threads': 32}
-    )
     for i, (a, b, c) in enumerate([(1, 1, 1), (2, 1, 1), (2, 2, 1), (2, 2, 2), (2, 4, 2), (4, 4, 2)]):
         scaling_run_results[f'2. weak {a * b * c}x'] = output_tp_result(
             title=f"2. weak {a * b * c}x",
-            code_params={'run_steps': 1000, 'box': (20 * a, 20 * b, 20 * c)},
-            sim_params={**gpu_cfg, 'use_mpi': True, 'mpi_n_threads': 16 if not gpu else 1}
+            code_params={'run_steps': 1000, 'box': (10 * a, 10 * b, 10 * c)},
+            sim_params={**gpu_cfg, 'use_mpi': True,'mpi_hw_threads': True, 'mpi_n_threads': (a * b * c) if not gpu else 1}
         )
     return scaling_run_results
 
@@ -203,8 +171,7 @@ c: The simulation cost increases by about 8x, because the box size increases by 
 
 c2: The simulation cost increases by about 8x, because the box size increases by 8x, and we are running on the same number of cores. (There seems to be no performance overhead when running on a single machine)
 
-d: I would expect the neighbor cost to _increase_ by about $4/3 \pi (2r)^3 - r^3$ or about $7r^3$, because the number of steps is the same, but the number of neighbors to check scales with the volume of the sphere of the neighbors.
-In our example, with relation to the base run this amounts to about a 33% increase in wall time. 
+d: The increase appears to be quadratic. As shown in the following graph ![Plot](desmos_skin.png){{ width=100% }}
 
 e: They are very similar, this is to be expected as the number of steps is the same, and the number of atoms is the same.
 
@@ -277,13 +244,41 @@ If this were not the case, then the sample would be considered a gas.
 
 ### b
 
-We have FCC, if we tell ovito to ignore PBC, then the attoms at the boundry would not be detected as fcc conformant,
+We have FCC, if we tell ovito to ignore PBC, then the atoms at the boundry would not be detected as fcc conformant,
 
-An expectable proportion would be arrount 1/6, but for some reason its closer to 1/7 in practice.
+To calculate this we note the following:
+- The coordination of FCC is 12.
+- The coordination of the atoms at the corners is 3, as there are first neighbors in only one direction for each dimension.
+- The coordination of the atoms on the edges is 5, as there are first neighbors in two directions for each dimension.
+- The coordination of the atoms on the faces is 8, as there are first neighbors in three directions for each dimension.
+- The coordination of the atoms in the middle is 12, as there are first neighbors in all directions for each dimension.
+
+Or so it should be, however, the coordination of the atoms in each of the corners is not always 3.
+
+This can be explained because the corners are not always the corner of an FCC cell, but sometimes the face centre.
+
+As a matter of fact, varying the voronoi polyhedra analysis' relative face area threshold between 0 and 20%, we can see that the coordination of some corners goes from 5 to 0. But never matches all the other corners simultaneously.
+
+As this makes the calculation very complex, and not only does this cause issues with corners, it also causes issues with edges.
+
+This phenomena can be observed in the following figures
 
 ![Initial FCC with PBC](fcc initial.png){{ width=100% }}
 
 ![Initial FCC without PBC](fcc no pbc ptm.png){{ width=100% }}
+
+Here we can see that the atoms at the edges and corners are not detected as FCC conformant.
+
+The inner attoms have been removed for clarity.
+
+
+![](voronoi-coordination-fcc-nopbc.png){{ width=100% }}
+
+We can also see the coordination histogram, which, other than 12, shows a lot of 9. Which is unexpected.
+
+Zooming into the histogram past that, we can see some 5, 6, 7 and 8. Further confirming that the edges and corners are not detected as FCC conformant, however also not aligning with our initial suposition that of 3, 5, 8, 12.
+
+![](fcc-voronoi-zoom.png){{ width=100% }}
 
 ### c
 
@@ -386,6 +381,23 @@ def plot_scaling_results(df):
     plt.clf()
 
 
+def plot_scaling_results2(df):
+    plt.clf()
+    # strong = t0/(t * cores)
+    # weak = t0/t
+    df['strong'] = df['strong'].iloc[0] / (df['strong'] * df.index)
+    df['weak'] = df['weak'].iloc[0] / df['weak']
+    ideal = [1.0] * len(df.index)
+    # Plot and save the figures
+    weak_speedup_fig = df.plot(marker='o', linestyle='-', label='Scaling')
+    plt.xlabel('')
+    plt.ylabel('Scaling')
+    plt.legend()
+    plt.plot(df.index, ideal, linestyle='--', label='Ideal Scaling')
+    weak_speedup_fig.get_figure().savefig('scaling.png')
+    plt.clf()
+
+
 def sample_scaling_data():
     data = {
         'weak': [1.47974, 2.82150, 5.61277, 11.21030, 23.51570, 52.26130],
@@ -395,7 +407,8 @@ def sample_scaling_data():
 
 
 # plot_scaling_results(sample_scaling_data())
-solve_tp1(scaling_tests=True, main_tp_tests=True)
+# plot_scaling_results2(sample_scaling_data())
+solve_tp1(scaling_tests=True, main_tp_tests=False, long_running_test=False)
 # mem_stress_test()
 # pandoc out.md -f markdown-implicit_figures -o out.pdf
 # pandoc out.md -f markdown-implicit_figures --from=markdown -t html+raw_tex --metadata title="TP 1" --pdf-engine-opt='--enable-local-file-access' -o out.pdf
