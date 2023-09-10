@@ -5,7 +5,7 @@ class MpiLammpsWrapper:
     @staticmethod
     def _get_code(box=(20, 20, 20), init_vel=1.0, neigh_skin=0.3, dump_pos_freq=10000, thermo_log_freq=5000,
                   run_steps=1000,
-                  do_image_dump=False, do_video_dump=False, balance=None, timestep=0.0001):
+                  do_image_dump=False, do_video_dump=False, balance=None, timestep=0.0001, newton="on"):
         image_dump = """
 dump             2 all image 25 image.*.jpg type type &
                  axes yes 0.8 0.02 view 60 -30
@@ -20,7 +20,7 @@ dump_modify      3 pad 3
                                                                         # 3d Lennard-Jones melt
 units            lj
 atom_style       atomic                                                 # / full
-newton           off
+newton           {newton}
 
 timestep         {timestep}
 lattice          fcc 0.8442                                             # Face center cubic / density

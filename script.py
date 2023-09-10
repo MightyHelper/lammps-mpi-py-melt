@@ -408,7 +408,7 @@ def sample_scaling_data():
 
 # plot_scaling_results(sample_scaling_data())
 # plot_scaling_results2(sample_scaling_data())
-solve_tp1(scaling_tests=True, main_tp_tests=False, long_running_test=False)
+solve_tp1(scaling_tests=True, main_tp_tests=True, long_running_test=True)
 # mem_stress_test()
 # pandoc out.md -f markdown-implicit_figures -o out.pdf
 # pandoc out.md -f markdown-implicit_figures --from=markdown -t html+raw_tex --metadata title="TP 1" --pdf-engine-opt='--enable-local-file-access' -o out.pdf
